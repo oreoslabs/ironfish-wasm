@@ -5,6 +5,7 @@ use wasm_bindgen::prelude::*;
 use web_sys::console;
 
 pub mod panic_hook;
+pub mod wasm_structs;
 
 #[cfg(feature = "wee_alloc")]
 #[global_allocator]
