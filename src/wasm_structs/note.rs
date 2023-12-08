@@ -37,21 +37,21 @@ impl WasmNote {
         })
     }
 
-    // #[wasm_bindgen]
-    // pub fn deserialize(bytes: &[u8]) -> Result<WasmNote, JsValue> {
-    //     panic_hook::set_once();
+    #[wasm_bindgen]
+    pub fn deserialize(bytes: &[u8]) -> Result<WasmNote, JsValue> {
+        panic_hook::set_once();
 
-    //     let cursor: std::io::Cursor<&[u8]> = std::io::Cursor::new(bytes);
-    //     let note = Note::read(cursor).map_err(WasmSaplingKeyError)?;
-    //     Ok(WasmNote { note })
-    // }
+        let cursor: std::io::Cursor<&[u8]> = std::io::Cursor::new(bytes);
+        let note = Note::read(cursor).map_err(WasmIronfishError)?;
+        Ok(WasmNote { note })
+    }
 
-    // #[wasm_bindgen]
-    // pub fn serialize(&self) -> Result<Vec<u8>, JsValue> {
-    //     let mut cursor: std::io::Cursor<Vec<u8>> = std::io::Cursor::new(vec![]);
-    //     self.note.write(&mut cursor).map_err(WasmIoError)?;
-    //     Ok(cursor.into_inner())
-    // }
+    #[wasm_bindgen]
+    pub fn serialize(&self) -> Result<Vec<u8>, JsValue> {
+        let mut cursor: std::io::Cursor<Vec<u8>> = std::io::Cursor::new(vec![]);
+        self.note.write(&mut cursor).map_err(WasmIronfishError)?;
+        Ok(cursor.into_inner())
+    }
 
     // /// Value this note represents.
     // #[wasm_bindgen(getter)]
