@@ -4,6 +4,7 @@ use std::collections::HashMap;
 use wasm_bindgen::prelude::*;
 use web_sys::console;
 
+mod ironfish_rust;
 pub mod panic_hook;
 pub mod wasm_structs;
 
