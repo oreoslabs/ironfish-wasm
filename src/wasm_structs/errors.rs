@@ -2,8 +2,6 @@ use crate::ironfish_rust::errors::IronfishError;
 
 pub struct WasmIoError(pub std::io::Error);
 pub struct WasmIronfishError(pub IronfishError);
-// pub struct WasmSaplingProofError(pub SaplingProofError);
-// pub struct WasmTransactionError(pub TransactionError);
 
 impl From<WasmIoError> for wasm_bindgen::JsValue {
     fn from(e: WasmIoError) -> Self {

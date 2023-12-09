@@ -1,5 +1,6 @@
-use ironfish_rust::assets::asset_identifier::AssetIdentifier;
 use wasm_bindgen::prelude::*;
+
+use crate::ironfish_rust::assets::asset_identifier::AssetIdentifier;
 
 use super::WasmIronfishError;
 
