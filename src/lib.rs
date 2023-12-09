@@ -5,6 +5,7 @@ use wasm_bindgen::prelude::*;
 use web_sys::console;
 
 mod ironfish_rust;
+mod ironfish_zkp;
 pub mod panic_hook;
 pub mod wasm_structs;
 
