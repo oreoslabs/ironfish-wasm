@@ -1,4 +1,4 @@
-use crate::ironfish_rust::errors::IronfishError;
+use ironfish_rust::errors::IronfishError;
 
 pub struct WasmIoError(pub std::io::Error);
 pub struct WasmIronfishError(pub IronfishError);

@@ -5,7 +5,7 @@ pub use errors::*;
 
 // mod note_encrypted;
 // pub use note_encrypted::WasmNoteEncrypted;
-mod assets;
+// mod assets;
 // mod note;
 // pub use note::WasmNote;
 
