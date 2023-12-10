@@ -4,10 +4,10 @@ use std::collections::HashMap;
 use wasm_bindgen::prelude::*;
 use web_sys::console;
 
-mod ironfish_rust;
-mod ironfish_zkp;
-pub mod panic_hook;
-pub mod wasm_structs;
+// mod ironfish_rust;
+// mod ironfish_zkp;
+// pub mod panic_hook;
+// pub mod wasm_structs;
 
 #[cfg(feature = "wee_alloc")]
 #[global_allocator]
@@ -55,7 +55,7 @@ pub fn send_obj_to_js() -> JsValue {
 
     let obj = Obj {
         field1: map,
-        field2: vec![vec![1, 2], vec![3, 4]],
+        field2: vec![vec![1, 2, 3], vec![3, 4]],
         field3: [1., 2., 3., 4.],
         field4: true,
         field5: "哈哈哈".to_string(),
