@@ -6,8 +6,8 @@ pub use errors::*;
 // mod note_encrypted;
 // pub use note_encrypted::WasmNoteEncrypted;
 mod assets;
-// mod note;
-// pub use note::WasmNote;
+mod note;
+pub use note::WasmNote;
 
 // mod spend_proof;
 // pub use spend_proof::WasmSpendProof;
