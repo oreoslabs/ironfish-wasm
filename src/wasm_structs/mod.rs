@@ -9,8 +9,8 @@ mod assets;
 mod note;
 pub use note::WasmNote;
 
-// mod spend_proof;
-// pub use spend_proof::WasmSpendProof;
+mod spend_description;
+pub use spend_description::WasmSpendDescription;
 
 // mod transaction;
 // pub use transaction::WasmTransaction;
