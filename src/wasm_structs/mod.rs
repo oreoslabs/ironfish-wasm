@@ -3,8 +3,8 @@ pub use super::panic_hook;
 mod errors;
 pub use errors::*;
 
-// mod note_encrypted;
-// pub use note_encrypted::WasmNoteEncrypted;
+mod note_encrypted;
+pub use note_encrypted::WasmNoteEncrypted;
 mod assets;
 mod note;
 pub use note::WasmNote;
