@@ -16,5 +16,5 @@ pub use note::WasmNote;
 // pub use transaction::WasmTransaction;
 // pub use transaction::WasmTransactionPosted;
 
-// mod witness;
-// pub use witness::JsWitness;
+mod witness;
+pub use witness::JsWitness;
