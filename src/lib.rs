@@ -181,6 +181,12 @@ pub fn spending_key_to_words(private_key: &str, language_code: LanguageCode) -> 
     Ok(mnemonic.into_phrase())
 }
 
+#[wasm_bindgen(js_name = "words_to_spending_key")]
+pub fn words_to_spending_key(words: String, language_code: LanguageCode) -> Result<String, JsValue> {
+    let key = SaplingKey::from_words(words, language_code.into()).map_err(WasmIronfishError)?;
+    Ok(key.hex_spending_key())
+}
+
 #[wasm_bindgen(js_name = "generateNewPublicAddress")]
 pub fn create_new_public_key_to_js(private_key: &str) -> Result<Key, JsValue> {
     let sapling_key = SaplingKey::from_hex(private_key).map_err(WasmIronfishError)?;
