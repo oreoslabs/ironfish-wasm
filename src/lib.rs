@@ -174,7 +174,14 @@ pub fn create_key_to_js() -> Key {
     }
 }
 
-#[wasm_bindgen(catch, js_name = "generateNewPublicAddress")]
+#[wasm_bindgen(js_name = "spending_key_to_words")]
+pub fn spending_key_to_words(private_key: &str, language_code: LanguageCode) -> Result<String, JsValue> {
+    let key = SaplingKey::from_hex(private_key).map_err(WasmIronfishError)?;
+    let mnemonic = key.to_words(language_code.into()).map_err(WasmIronfishError)?;
+    Ok(mnemonic.into_phrase())
+}
+
+#[wasm_bindgen(js_name = "generateNewPublicAddress")]
 pub fn create_new_public_key_to_js(private_key: &str) -> Result<Key, JsValue> {
     let sapling_key = SaplingKey::from_hex(private_key).map_err(WasmIronfishError)?;
 
