@@ -1,4 +1,4 @@
-use ironfish_rust::{SaplingKey, keys::Language};
+use ironfish_rust::{SaplingKey, keys::Language, sapling_bls12, PublicAddress};
 use serde::{Deserialize, Serialize};
 use wasm_structs::WasmIronfishError;
 use std::collections::HashMap;
@@ -198,6 +198,16 @@ pub fn create_new_public_key_to_js(private_key: &str) -> Result<Key, JsValue> {
         outgoing_view_key: sapling_key.outgoing_view_key().hex_key(),
         public_address: sapling_key.public_address().hex_public_address(),
     })
+}
+
+#[wasm_bindgen(js_name = "initialize_sapling")]
+pub fn initialize_sapling() {
+    let _ = sapling_bls12::SAPLING.clone();
+}
+
+#[wasm_bindgen(js_name = "is_valid_public_address")]
+pub fn is_valid_public_address(hex_address: String) -> bool {
+    PublicAddress::from_hex(&hex_address).is_ok()
 }
 
 #[cfg(test)]
