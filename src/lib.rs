@@ -1,4 +1,6 @@
+use ironfish_rust::SaplingKey;
 use serde::{Deserialize, Serialize};
+use wasm_structs::WasmIronfishError;
 use std::collections::HashMap;
 
 use wasm_bindgen::prelude::*;
@@ -95,7 +97,74 @@ pub fn test_point() -> Point {
     p
 }
 
+#[wasm_bindgen]
+pub struct Key {
+    spending_key: String,
+    incoming_view_key: String,
+    outgoing_view_key: String,
+    public_address: String,
+}
+
+#[wasm_bindgen]
+impl Key {
+    #[wasm_bindgen(getter)]
+    pub fn spending_key(&self) -> String {
+        self.spending_key.clone()
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn incoming_view_key(&self) -> String {
+        self.incoming_view_key.clone()
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn outgoing_view_key(&self) -> String {
+        self.outgoing_view_key.clone()
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn public_address(&self) -> String {
+        self.public_address.clone()
+    }
+}
+
+#[wasm_bindgen(js_name = "generateKey")]
+pub fn create_key_to_js() -> Key {
+    let sapling_key = SaplingKey::generate_key();
+
+    Key {
+        spending_key: sapling_key.hex_spending_key(),
+        incoming_view_key: sapling_key.incoming_view_key().hex_key(),
+        outgoing_view_key: sapling_key.outgoing_view_key().hex_key(),
+        public_address: sapling_key.public_address().hex_public_address(),
+    }
+}
+
+#[wasm_bindgen(catch, js_name = "generateNewPublicAddress")]
+pub fn create_new_public_key_to_js(private_key: &str) -> Result<Key, JsValue> {
+    let sapling_key = SaplingKey::from_hex(private_key).map_err(WasmIronfishError)?;
+
+    Ok(Key {
+        spending_key: sapling_key.hex_spending_key(),
+        incoming_view_key: sapling_key.incoming_view_key().hex_key(),
+        outgoing_view_key: sapling_key.outgoing_view_key().hex_key(),
+        public_address: sapling_key.public_address().hex_public_address(),
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_create_new_public_key_to_js() {
+        let key1 = create_key_to_js();
+        let key2 = create_new_public_key_to_js(&key1.spending_key).unwrap();
+
+        assert_eq!(key1.spending_key(), key2.spending_key());
+        assert_eq!(key1.incoming_view_key(), key2.incoming_view_key());
+        assert_eq!(key1.outgoing_view_key(), key2.outgoing_view_key());
+
+        assert_eq!(key1.public_address(), key2.public_address());
+    }
 }
