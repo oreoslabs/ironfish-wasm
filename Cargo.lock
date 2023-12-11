@@ -828,6 +828,7 @@ dependencies = [
 [[package]]
 name = "ironfish"
 version = "0.3.0"
+source = "git+https://github.com/oreoslabs/ironfish-rust#3302048f6beb38246e320a9b2f38dff230875e2d"
 dependencies = [
  "bellperson",
  "blake2b_simd",
@@ -875,6 +876,7 @@ dependencies = [
 [[package]]
 name = "ironfish_zkp"
 version = "0.2.0"
+source = "git+https://github.com/oreoslabs/ironfish-optimize.git?branch=wasm#da3d03f763b215cb447e663b95a6a384ab25595d"
 dependencies = [
  "bellperson",
  "blake2s_simd",
