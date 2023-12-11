@@ -1,4 +1,4 @@
-use ironfish_rust::SaplingKey;
+use ironfish_rust::{SaplingKey, keys::Language};
 use serde::{Deserialize, Serialize};
 use wasm_structs::WasmIronfishError;
 use std::collections::HashMap;
@@ -98,8 +98,36 @@ pub fn test_point() -> Point {
 }
 
 #[wasm_bindgen]
+pub enum LanguageCode {
+    English,
+    ChineseSimplified,
+    ChineseTraditional,
+    French,
+    Italian,
+    Japanese,
+    Korean,
+    Spanish,
+}
+
+impl From<LanguageCode> for Language {
+    fn from(item: LanguageCode) -> Self {
+        match item {
+            LanguageCode::English => Language::English,
+            LanguageCode::ChineseSimplified => Language::ChineseSimplified,
+            LanguageCode::ChineseTraditional => Language::ChineseTraditional,
+            LanguageCode::French => Language::French,
+            LanguageCode::Italian => Language::Italian,
+            LanguageCode::Japanese => Language::Japanese,
+            LanguageCode::Korean => Language::Korean,
+            LanguageCode::Spanish => Language::Spanish,
+        }
+    }
+}
+
+#[wasm_bindgen]
 pub struct Key {
     spending_key: String,
+    view_key: String,
     incoming_view_key: String,
     outgoing_view_key: String,
     public_address: String,
@@ -110,6 +138,11 @@ impl Key {
     #[wasm_bindgen(getter)]
     pub fn spending_key(&self) -> String {
         self.spending_key.clone()
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn view_key(&self) -> String {
+        self.view_key.clone()
     }
 
     #[wasm_bindgen(getter)]
@@ -134,6 +167,7 @@ pub fn create_key_to_js() -> Key {
 
     Key {
         spending_key: sapling_key.hex_spending_key(),
+        view_key: sapling_key.view_key().hex_key(),
         incoming_view_key: sapling_key.incoming_view_key().hex_key(),
         outgoing_view_key: sapling_key.outgoing_view_key().hex_key(),
         public_address: sapling_key.public_address().hex_public_address(),
@@ -146,6 +180,7 @@ pub fn create_new_public_key_to_js(private_key: &str) -> Result<Key, JsValue> {
 
     Ok(Key {
         spending_key: sapling_key.hex_spending_key(),
+        view_key: sapling_key.view_key().hex_key(),
         incoming_view_key: sapling_key.incoming_view_key().hex_key(),
         outgoing_view_key: sapling_key.outgoing_view_key().hex_key(),
         public_address: sapling_key.public_address().hex_public_address(),
@@ -162,6 +197,7 @@ mod tests {
         let key2 = create_new_public_key_to_js(&key1.spending_key).unwrap();
 
         assert_eq!(key1.spending_key(), key2.spending_key());
+        assert_eq!(key1.view_key(), key2.view_key());
         assert_eq!(key1.incoming_view_key(), key2.incoming_view_key());
         assert_eq!(key1.outgoing_view_key(), key2.outgoing_view_key());
 
