@@ -4,7 +4,7 @@ mod errors;
 pub use errors::*;
 
 mod note_encrypted;
-pub use note_encrypted::WasmNoteEncrypted;
+pub use note_encrypted::*;
 mod assets;
 mod note;
 pub use note::WasmNote;
