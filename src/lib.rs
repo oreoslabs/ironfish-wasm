@@ -1,7 +1,7 @@
-use ironfish_rust::{SaplingKey, keys::Language, sapling_bls12, PublicAddress};
+use ironfish_rust::{keys::Language, sapling_bls12, PublicAddress, SaplingKey};
 use serde::{Deserialize, Serialize};
-use wasm_structs::WasmIronfishError;
 use std::collections::HashMap;
+use wasm_structs::WasmIronfishError;
 
 use wasm_bindgen::prelude::*;
 use web_sys::console;
@@ -175,14 +175,22 @@ pub fn create_key_to_js() -> Key {
 }
 
 #[wasm_bindgen(js_name = "spending_key_to_words")]
-pub fn spending_key_to_words(private_key: &str, language_code: LanguageCode) -> Result<String, JsValue> {
+pub fn spending_key_to_words(
+    private_key: &str,
+    language_code: LanguageCode,
+) -> Result<String, JsValue> {
     let key = SaplingKey::from_hex(private_key).map_err(WasmIronfishError)?;
-    let mnemonic = key.to_words(language_code.into()).map_err(WasmIronfishError)?;
+    let mnemonic = key
+        .to_words(language_code.into())
+        .map_err(WasmIronfishError)?;
     Ok(mnemonic.into_phrase())
 }
 
 #[wasm_bindgen(js_name = "words_to_spending_key")]
-pub fn words_to_spending_key(words: String, language_code: LanguageCode) -> Result<String, JsValue> {
+pub fn words_to_spending_key(
+    words: String,
+    language_code: LanguageCode,
+) -> Result<String, JsValue> {
     let key = SaplingKey::from_words(words, language_code.into()).map_err(WasmIronfishError)?;
     Ok(key.hex_spending_key())
 }
