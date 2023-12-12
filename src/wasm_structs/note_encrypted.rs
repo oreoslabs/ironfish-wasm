@@ -2,6 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
+use ironfish_rust::merkle_note::NOTE_ENCRYPTION_KEY_SIZE;
+use ironfish_rust::note::ENCRYPTED_NOTE_SIZE;
+use ironfish_rust::serializing::aead::MAC_SIZE;
 use ironfish_rust::IncomingViewKey;
 use ironfish_rust::MerkleNote;
 use ironfish_rust::MerkleNoteHash;
@@ -9,6 +12,26 @@ use ironfish_rust::OutgoingViewKey;
 use wasm_bindgen::prelude::*;
 
 use super::{panic_hook, WasmIronfishError, WasmNote};
+
+#[wasm_bindgen]
+pub fn get_note_encryption_key_length() -> u32 {
+    NOTE_ENCRYPTION_KEY_SIZE as u32
+}
+
+#[wasm_bindgen]
+pub fn get_mac_length() -> u32 {
+    MAC_SIZE as u32
+}
+
+#[wasm_bindgen]
+pub fn get_encrypted_note_plaintext_length() -> u32 {
+    ENCRYPTED_NOTE_SIZE as u32 + get_mac_length()
+}
+
+#[wasm_bindgen]
+pub fn get_encrypted_note_length() -> u32 {
+    get_note_encryption_key_length() + get_encrypted_note_plaintext_length() + 96
+}
 
 #[wasm_bindgen]
 pub struct WasmNoteEncrypted {
@@ -102,8 +125,8 @@ impl WasmNoteEncrypted {
 mod tests {
     use ironfish_rust::assets::asset_identifier::AssetIdentifier;
     use ironfish_rust::keys::EphemeralKeyPair;
-    use rand::{thread_rng, Rng};
     use ironfish_zkp::primitives::ValueCommitment;
+    use rand::{thread_rng, Rng};
 
     use super::*;
     use ironfish_rust::merkle_note::MerkleNote;
