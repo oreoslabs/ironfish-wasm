@@ -1,4 +1,3 @@
-use super::assets::WasmAssetIdentifier;
 use super::{panic_hook, WasmIronfishError};
 use ironfish_rust::note::Memo;
 use ironfish_rust::{Note, ViewKey};
@@ -11,24 +10,24 @@ pub struct WasmNote {
 
 #[wasm_bindgen]
 impl WasmNote {
-    #[wasm_bindgen(constructor)]
-    pub fn new(
-        owner: &str,
-        value: u64,
-        memo: &str,
-        asset_id: WasmAssetIdentifier,
-        sender: &str,
-    ) -> Result<WasmNote, JsValue> {
-        panic_hook::set_once();
+    // #[wasm_bindgen(constructor)]
+    // pub fn new(
+    //     owner: &str,
+    //     value: u64,
+    //     memo: &str,
+    //     asset_id: WasmAssetIdentifier,
+    //     sender: &str,
+    // ) -> Result<WasmNote, JsValue> {
+    //     panic_hook::set_once();
 
-        let owner_address =
-            ironfish_rust::PublicAddress::from_hex(owner).map_err(WasmIronfishError)?;
-        let asset_id = asset_id.try_into()?;
-        let sender = ironfish_rust::PublicAddress::from_hex(sender).map_err(WasmIronfishError)?;
-        Ok(WasmNote {
-            note: Note::new(owner_address, value, Memo::from(memo), asset_id, sender),
-        })
-    }
+    //     let owner_address =
+    //         ironfish_rust::PublicAddress::from_hex(owner).map_err(WasmIronfishError)?;
+    //     let asset_id = asset_id.try_into()?;
+    //     let sender = ironfish_rust::PublicAddress::from_hex(sender).map_err(WasmIronfishError)?;
+    //     Ok(WasmNote {
+    //         note: Note::new(owner_address, value, Memo::from(memo), asset_id, sender),
+    //     })
+    // }
 
     #[wasm_bindgen]
     pub fn deserialize(bytes: &[u8]) -> Result<WasmNote, JsValue> {
