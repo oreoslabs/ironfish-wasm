@@ -187,8 +187,8 @@ pub fn words_to_spending_key(words: String, language_code: LanguageCode) -> Resu
     Ok(key.hex_spending_key())
 }
 
-#[wasm_bindgen(js_name = "generateNewPublicAddress")]
-pub fn create_new_public_key_to_js(private_key: &str) -> Result<Key, JsValue> {
+#[wasm_bindgen(js_name = "generatePublicAddress")]
+pub fn create_public_key_to_js(private_key: &str) -> Result<Key, JsValue> {
     let sapling_key = SaplingKey::from_hex(private_key).map_err(WasmIronfishError)?;
 
     Ok(Key {
@@ -217,7 +217,7 @@ mod tests {
     #[test]
     fn test_create_new_public_key_to_js() {
         let key1 = create_key_to_js();
-        let key2 = create_new_public_key_to_js(&key1.spending_key).unwrap();
+        let key2 = create_public_key_to_js(&key1.spending_key).unwrap();
 
         assert_eq!(key1.spending_key(), key2.spending_key());
         assert_eq!(key1.view_key(), key2.view_key());

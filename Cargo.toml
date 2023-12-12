@@ -28,6 +28,9 @@ version = "0.3.60"
 
 [dev-dependencies]
 js-sys = "0.3.60"
+rand = "0.8.5"
+ironfish_zkp = { package = "ironfish_zkp", git = "https://github.com/oreoslabs/ironfish-optimize.git", branch = "wasm"}
+jubjub = { git = "https://github.com/iron-fish/jubjub.git", branch = "blstrs" }
 
 [profile.dev]
 debug = true

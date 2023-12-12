@@ -72,3 +72,4 @@ impl WasmNote {
         Ok(self.note.nullifier(&view_key, position).to_vec())
     }
 }
+
