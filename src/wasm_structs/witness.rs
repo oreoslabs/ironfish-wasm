@@ -14,7 +14,7 @@ use super::panic_hook;
 #[wasm_bindgen(typescript_custom_section)]
 const IWITNESS: &'static str = r#"
 interface IWitness {
-    verify(myHash: Uint8Array): bool;
+    verify(myHash: Uint8Array): boolean;
     authPath(): IWitnessNode[];
     treeSize(): number;
     serializeRootHash(): Uint8Array;
