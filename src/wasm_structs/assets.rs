@@ -38,12 +38,14 @@ pub struct WasmAsset {
 }
 
 #[wasm_bindgen]
-impl  WasmAsset {
+impl WasmAsset {
     #[wasm_bindgen(constructor)]
-    pub fn new(creator_public_address: String,
+    pub fn new(
+        creator_public_address: String,
         name: String,
-        metadata: String) -> Result<WasmAsset, JsValue> {
-            let public_address =
+        metadata: String,
+    ) -> Result<WasmAsset, JsValue> {
+        let public_address =
             PublicAddress::from_hex(&creator_public_address).map_err(WasmIronfishError)?;
 
         Ok(WasmAsset {
