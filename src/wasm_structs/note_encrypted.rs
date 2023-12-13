@@ -40,12 +40,12 @@ pub struct WasmNoteEncrypted {
 
 #[wasm_bindgen]
 impl WasmNoteEncrypted {
-    #[wasm_bindgen]
-    pub fn deserialize(bytes: &[u8]) -> Result<WasmNoteEncrypted, JsValue> {
+    #[wasm_bindgen(constructor)]
+    pub fn new(bytes: &[u8]) -> Result<WasmNoteEncrypted, JsValue> {
         panic_hook::set_once();
 
-        let cursor: std::io::Cursor<&[u8]> = std::io::Cursor::new(bytes);
-        let note = MerkleNote::read(cursor).map_err(WasmIronfishError)?;
+        let mut cursor: std::io::Cursor<&[u8]> = std::io::Cursor::new(bytes);
+        let note = MerkleNote::read(&mut cursor).map_err(WasmIronfishError)?;
         Ok(WasmNoteEncrypted { note })
     }
 
@@ -54,6 +54,7 @@ impl WasmNoteEncrypted {
         let mut cursor: std::io::Cursor<Vec<u8>> = std::io::Cursor::new(vec![]);
         self.note.write(&mut cursor).map_err(WasmIronfishError)?;
         Ok(cursor.into_inner())
+        
     }
 
     #[wasm_bindgen]
