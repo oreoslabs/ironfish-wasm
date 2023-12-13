@@ -3,6 +3,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
 use super::get_encrypted_note_length;
+use super::WasmAsset;
+use ironfish_rust::assets::asset_identifier::AssetIdentifier;
 use ironfish_rust::transaction::outputs::PROOF_SIZE;
 use ironfish_rust::transaction::TransactionVersion;
 use ironfish_rust::transaction::TRANSACTION_EXPIRATION_SIZE;
@@ -11,7 +13,7 @@ use ironfish_rust::transaction::TRANSACTION_PUBLIC_KEY_SIZE;
 use ironfish_rust::transaction::TRANSACTION_SIGNATURE_SIZE;
 use wasm_bindgen::prelude::*;
 
-use ironfish_rust::{MerkleNoteHash, ProposedTransaction, PublicAddress, SaplingKey, Transaction};
+use ironfish_rust::{ProposedTransaction, PublicAddress, SaplingKey, Transaction};
 
 use super::errors::*;
 use super::note::WasmNote;
@@ -73,14 +75,6 @@ impl WasmTransactionPosted {
             .map_err(WasmIronfishError)?;
         Ok(cursor.into_inner())
     }
-
-    // #[wasm_bindgen]
-    // pub fn verify(&self) -> bool {
-    //     match self.transaction.verify() {
-    //         Ok(_) => true,
-    //         Err(_e) => false,
-    //     }
-    // }
 
     #[wasm_bindgen(getter, js_name = "notesLength")]
     pub fn notes_length(&self) -> usize {
@@ -182,39 +176,36 @@ impl WasmTransaction {
     #[wasm_bindgen]
     pub fn mint(
         &mut self,
-        asset: &NativeAsset,
-        value: BigInt,
-        transfer_ownership_to: Option<&str>,
+        asset: &WasmAsset,
+        value: u64,
+        transfer_ownership_to: Option<String>,
     ) -> Result<String, JsValue> {
-        let value_u64 = value.get_u64().1;
         match transfer_ownership_to {
             None => self
                 .transaction
-                .add_mint(asset.asset, value_u64)
-                .map_err(to_napi_err)?,
+                .add_mint(asset.asset, value)
+                .map_err(WasmIronfishError)?,
             Some(new_owner) => {
-                let new_owner = PublicAddress::from_hex(new_owner).map_err(to_napi_err)?;
+                let new_owner = PublicAddress::from_hex(&new_owner).map_err(WasmIronfishError)?;
                 self.transaction
-                    .add_mint_with_new_owner(asset.asset, value_u64, new_owner)
-                    .map_err(to_napi_err)?;
+                    .add_mint_with_new_owner(asset.asset, value, new_owner)
+                    .map_err(WasmIronfishError)?;
             }
         }
 
-        Ok(())
+        Ok("".to_string())
     }
 
     /// Burn some supply of a given asset and value as part of this transaction.
-    #[napi]
-    pub fn burn(&mut self, asset_id_js_bytes: JsBuffer, value: BigInt) -> Result<()> {
-        let asset_id_bytes = asset_id_js_bytes.into_value()?;
-        let asset_id = AssetIdentifier::new(asset_id_bytes.as_ref().try_into().unwrap())
-            .map_err(to_napi_err)?;
-        let value_u64 = value.get_u64().1;
+    #[wasm_bindgen]
+    pub fn burn(&mut self, asset_id_bytes: &[u8], value: u64) -> Result<String, JsValue> {
+        let asset_id =
+            AssetIdentifier::new(asset_id_bytes.try_into().unwrap()).map_err(WasmIronfishError)?;
         self.transaction
-            .add_burn(asset_id, value_u64)
-            .map_err(to_napi_err)?;
+            .add_burn(asset_id, value)
+            .map_err(WasmIronfishError)?;
 
-        Ok(())
+        Ok("".to_string())
     }
 
     /// Special case for posting a miners fee transaction. Miner fee transactions
@@ -244,20 +235,18 @@ impl WasmTransaction {
     #[wasm_bindgen]
     pub fn post(
         &mut self,
-        spender_hex_key: &str,
         change_goes_to: Option<String>,
         intended_transaction_fee: u64,
     ) -> Result<WasmTransactionPosted, JsValue> {
-        let spender_key = Key::from_hex(spender_hex_key).map_err(WasmSaplingKeyError)?;
         let change_key = match change_goes_to {
-            Some(s) => Some(PublicAddress::from_hex(&s).map_err(WasmSaplingKeyError)?),
+            Some(s) => Some(PublicAddress::from_hex(&s).map_err(WasmIronfishError)?),
             None => None,
         };
 
         let posted_transaction = self
             .transaction
-            .post(&spender_key, change_key, intended_transaction_fee)
-            .map_err(WasmTransactionError)?;
+            .post(change_key, intended_transaction_fee)
+            .map_err(WasmIronfishError)?;
 
         Ok(WasmTransactionPosted {
             transaction: posted_transaction,
@@ -266,13 +255,6 @@ impl WasmTransaction {
 
     #[wasm_bindgen(js_name = "setExpirationSequence")]
     pub fn set_expiration_sequence(&mut self, expiration_sequence: u32) {
-        self.transaction
-            .set_expiration_sequence(expiration_sequence);
-    }
-}
-
-impl Default for WasmTransaction {
-    fn default() -> Self {
-        WasmTransaction::new()
+        self.transaction.set_expiration(expiration_sequence);
     }
 }

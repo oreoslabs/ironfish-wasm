@@ -15,8 +15,8 @@ pub use note::*;
 mod spend_description;
 pub use spend_description::*;
 
-// mod transaction;
-// pub use transaction::*;
+mod transaction;
+pub use transaction::*;
 
 mod witness;
 pub use witness::*;
