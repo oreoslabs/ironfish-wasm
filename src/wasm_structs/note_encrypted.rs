@@ -54,7 +54,6 @@ impl WasmNoteEncrypted {
         let mut cursor: std::io::Cursor<Vec<u8>> = std::io::Cursor::new(vec![]);
         self.note.write(&mut cursor).map_err(WasmIronfishError)?;
         Ok(cursor.into_inner())
-        
     }
 
     #[wasm_bindgen]
@@ -163,8 +162,8 @@ mod tests {
         merkle_note.write(&mut cursor).unwrap();
 
         let vec = cursor.into_inner();
-        let wasm1 = WasmNoteEncrypted::deserialize(&vec).unwrap();
-        let wasm2 = WasmNoteEncrypted::deserialize(&vec).unwrap();
+        let wasm1 = WasmNoteEncrypted::new(&vec).unwrap();
+        let wasm2 = WasmNoteEncrypted::new(&vec).unwrap();
         assert!(wasm1.equals(&wasm2))
     }
 
