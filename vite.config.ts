@@ -1,5 +1,6 @@
 import { defineConfig } from "vite";
 import wasmPack from "vite-plugin-wasm-pack";
+import { nodePolyfills } from "vite-plugin-node-polyfills";
 
 export default defineConfig(({ mode }) => ({
   build: {
@@ -8,15 +9,6 @@ export default defineConfig(({ mode }) => ({
       transformMixedEsModules: true,
     },
     minify: mode === "production",
-    rollupOptions: {
-      input: {
-        index: "./index.html",
-      },
-      output: {
-        entryFileNames: "[name].js",
-        format: "esm",
-      },
-    },
   },
   server: {
     port: 5173,
@@ -35,5 +27,17 @@ export default defineConfig(({ mode }) => ({
     exclude: [],
   },
   define: {},
-  plugins: [wasmPack(["./ironfish_wasm"])],
+  plugins: [
+    nodePolyfills({
+      exclude: [],
+      globals: {
+        Buffer: true,
+        global: true,
+        process: true,
+      },
+      // Whether to polyfill `node:` protocol imports.
+      protocolImports: true,
+    }),
+    wasmPack(["./ironfish_wasm"]),
+  ],
 }));
