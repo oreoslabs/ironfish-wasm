@@ -827,7 +827,7 @@ dependencies = [
 [[package]]
 name = "ironfish"
 version = "0.3.0"
-source = "git+https://github.com/oreoslabs/ironfish-optimize.git?branch=wasm#c3e09f57c34a6242e1c18a47538343c297bb5637"
+source = "git+https://github.com/oreoslabs/ironfish-optimize.git?branch=feature/support-wasm#c87c1fe4d9e39fe9e9b05a4ddded35fcf0ef4a1b"
 dependencies = [
  "bellperson",
  "blake2b_simd",
@@ -840,7 +840,7 @@ dependencies = [
  "ff",
  "group",
  "hex",
- "ironfish_zkp",
+ "ironfish_zkp 0.2.0 (git+https://github.com/oreoslabs/ironfish-optimize.git?branch=feature/support-wasm)",
  "jubjub 0.9.0 (git+https://github.com/iron-fish/jubjub.git?branch=blstrs)",
  "lazy_static",
  "libc",
@@ -857,7 +857,7 @@ dependencies = [
  "blst",
  "getrandom 0.2.11",
  "ironfish",
- "ironfish_zkp",
+ "ironfish_zkp 0.2.0 (git+https://github.com/oreoslabs/ironfish-optimize.git?branch=wasm)",
  "js-sys",
  "jubjub 0.9.0 (git+https://github.com/iron-fish/jubjub.git?branch=blstrs)",
  "rand 0.8.5",
@@ -872,7 +872,7 @@ dependencies = [
 [[package]]
 name = "ironfish_zkp"
 version = "0.2.0"
-source = "git+https://github.com/oreoslabs/ironfish-optimize.git?branch=wasm#c3e09f57c34a6242e1c18a47538343c297bb5637"
+source = "git+https://github.com/oreoslabs/ironfish-optimize.git?branch=feature/support-wasm#c87c1fe4d9e39fe9e9b05a4ddded35fcf0ef4a1b"
 dependencies = [
  "bellperson",
  "blake2s_simd",
@@ -881,15 +881,30 @@ dependencies = [
  "ff",
  "getrandom 0.2.11",
  "group",
- "js-sys",
  "jubjub 0.9.0 (git+https://github.com/iron-fish/jubjub.git?branch=blstrs)",
  "lazy_static",
  "rand 0.8.5",
  "rand_core 0.6.4",
- "serde",
- "serde-wasm-bindgen",
- "wasm-bindgen",
- "web-sys",
+ "zcash_primitives",
+ "zcash_proofs",
+]
+
+[[package]]
+name = "ironfish_zkp"
+version = "0.2.0"
+source = "git+https://github.com/oreoslabs/ironfish-optimize.git?branch=wasm#5c8198929313f676b191d5a056a4793035fcf93b"
+dependencies = [
+ "bellperson",
+ "blake2s_simd",
+ "blstrs",
+ "byteorder",
+ "ff",
+ "getrandom 0.2.11",
+ "group",
+ "jubjub 0.9.0 (git+https://github.com/iron-fish/jubjub.git?branch=blstrs)",
+ "lazy_static",
+ "rand 0.8.5",
+ "rand_core 0.6.4",
  "zcash_primitives",
  "zcash_proofs",
 ]
