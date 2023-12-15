@@ -20,11 +20,17 @@ blst = "=0.3.10"
 ironfish_rust = { package = "ironfish", git = "https://github.com/oreoslabs/ironfish-optimize.git", branch = "feature/support-wasm"}
 rand_core = { version = "0.6.4", features = ["getrandom"] }
 getrandom = { version = "0.2", optional = true, features = ["js"]}
+subtle = "2.4"
+hex = "0.4.3"
 
 
 [dependencies.web-sys]
 features = ["console"]
 version = "0.3.60"
+
+[dependencies.serde_json]
+version = "1"
+
 
 [dev-dependencies]
 js-sys = "0.3.60"
