@@ -8,7 +8,7 @@ export default defineConfig(({ mode }) => ({
     commonjsOptions: {
       transformMixedEsModules: true,
     },
-    minify: mode === "production",
+    minify: false,
   },
   server: {
     port: 5173,
