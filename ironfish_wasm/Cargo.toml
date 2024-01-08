@@ -17,7 +17,8 @@ serde = { version = "1.0", features = ["derive"] }
 serde-wasm-bindgen = "0.4"
 js-sys = "0.3"
 blst = "=0.3.10"
-ironfish_rust = { package = "ironfish", git = "https://github.com/oreoslabs/ironfish-optimize.git", branch = "feature/support-wasm"}
+# ironfish_rust = { package = "ironfish", git = "https://github.com/oreoslabs/ironfish-optimize.git", branch = "feature/support-wasm"}
+ironfish_rust = { package = "ironfish", path = "../../ironfish/ironfish-rust" }
 rand_core = { version = "0.6.4", features = ["getrandom"] }
 getrandom = { version = "0.2", optional = true, features = ["js"]}
 subtle = "2.4"
@@ -35,7 +36,8 @@ version = "1"
 [dev-dependencies]
 js-sys = "0.3.60"
 rand = "0.8.5"
-ironfish_zkp = { package = "ironfish_zkp", git = "https://github.com/oreoslabs/ironfish-optimize.git", branch = "feature/support-wasm"}
+# ironfish_zkp = { package = "ironfish_zkp", git = "https://github.com/oreoslabs/ironfish-optimize.git", branch = "feature/support-wasm"}
+ironfish_zkp = { package = "ironfish_zkp", path = "../../ironfish/ironfish-zkp" }
 jubjub = { git = "https://github.com/iron-fish/jubjub.git", branch = "blstrs" }
 
 [profile.dev]

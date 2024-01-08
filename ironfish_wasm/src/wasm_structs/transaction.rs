@@ -18,7 +18,7 @@ use ironfish_rust::{ProposedTransaction, PublicAddress, SaplingKey, Transaction}
 use super::errors::*;
 use super::note::WasmNote;
 use super::panic_hook;
-use super::witness::JsWitness;
+use super::witness::{JsWitness, JsWitness1};
 use super::WasmSpendDescription;
 
 #[wasm_bindgen]
@@ -165,9 +165,13 @@ impl WasmTransaction {
 
     /// Spend the note owned by spender_hex_key at the given witness location.
     #[wasm_bindgen]
-    pub fn spend(&mut self, note: &WasmNote, witness: &JsWitness) -> Result<String, JsValue> {
+    pub fn spend(&mut self, note: &WasmNote, witness: JsWitness) -> Result<String, JsValue> {
+        let witness = JsWitness1 {
+            obj: witness
+        };
+        // println!("spend: {:?}", witness);
         self.transaction
-            .add_spend(note.note.clone(), witness)
+            .add_spend(note.note.clone(), &witness)
             .map_err(WasmIronfishError)?;
         Ok("".to_string())
     }
@@ -251,6 +255,21 @@ impl WasmTransaction {
         Ok(WasmTransactionPosted {
             transaction: posted_transaction,
         })
+    }
+
+    #[wasm_bindgen]
+    pub fn build_circuits(
+        &mut self,
+        change_goes_to: Option<String>,
+        intended_transaction_fee: u64,
+    ) -> Result<(), JsValue> {
+        let change_key = match change_goes_to {
+            Some(s) => Some(PublicAddress::from_hex(&s).map_err(WasmIronfishError)?),
+            None => None,
+        };
+
+        let circuits = self.transaction.build_circuits(change_key, intended_transaction_fee).map_err(WasmIronfishError)?;
+        Ok(())
     }
 
     #[wasm_bindgen(js_name = "setExpirationSequence")]
