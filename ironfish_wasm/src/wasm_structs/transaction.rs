@@ -257,6 +257,21 @@ impl WasmTransaction {
         })
     }
 
+    #[wasm_bindgen]
+    pub fn build_circuits(
+        &mut self,
+        change_goes_to: Option<String>,
+        intended_transaction_fee: u64,
+    ) -> Result<(), JsValue> {
+        let change_key = match change_goes_to {
+            Some(s) => Some(PublicAddress::from_hex(&s).map_err(WasmIronfishError)?),
+            None => None,
+        };
+
+        let circuits = self.transaction.build_circuits(change_key, intended_transaction_fee).map_err(WasmIronfishError)?;
+        Ok(())
+    }
+
     #[wasm_bindgen(js_name = "setExpirationSequence")]
     pub fn set_expiration_sequence(&mut self, expiration_sequence: u32) {
         self.transaction.set_expiration(expiration_sequence);

@@ -224,11 +224,16 @@ async function main() {
     const parsedNote = WasmNote.deserialize(Buffer.from(note, "hex"));
     tx.output(parsedNote);
   }
-  const signedTx = tx.post(
+  // const signedTx = tx.post(
+  //   "7dbb62fa99ac81640b6ee5f84a3b0e2390a1f40ccfa6eb6151ff5e0a98503923",
+  //   1n
+  // );
+  const signedTx = tx.build_circuits(
     "7dbb62fa99ac81640b6ee5f84a3b0e2390a1f40ccfa6eb6151ff5e0a98503923",
     1n
   );
-  const result = Buffer.from(signedTx.serialize()).toString("hex");
+  // const result = Buffer.from(signedTx.serialize()).toString("hex");
+  console.log("after build_circuits ", performance.now() - start);
 }
 
 main();
