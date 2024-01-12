@@ -92,7 +92,8 @@ impl WitnessTrait for JsWitness1 {
 
         // let obj: JsWitness  = serde_wasm_bindgen::from_value(self.obj).unwrap();
 
-        self.obj.auth_path()
+        self.obj
+            .auth_path()
             .iter()
             .map(|element| {
                 // Unchecked cast here so that wasm-bindgen allows duck-typed objects
