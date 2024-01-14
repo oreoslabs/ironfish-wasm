@@ -199,7 +199,7 @@ async function main() {
   console.log("===> wasm: ", wasm.__wbindgen_add_to_stack_pointer, wasm);
   const pk = generateKey();
   console.log("pk ", pk.spending_key);
-  const start = performance.now();
+  let start = performance.now();
   initialize_sapling();
   console.log("after initializes_sapling ", performance.now() - start);
 
@@ -232,8 +232,49 @@ async function main() {
     "7dbb62fa99ac81640b6ee5f84a3b0e2390a1f40ccfa6eb6151ff5e0a98503923",
     1n
   );
-  // const result = Buffer.from(signedTx.serialize()).toString("hex");
-  console.log("after build_circuits ", performance.now() - start);
+  console.log(
+    "signedTx: ",
+    signedTx.mintCircuits,
+    signedTx.outputCircuits,
+    signedTx.spendCircuits,
+    signedTx.hellmanKeys
+  );
+
+  start = performance.now();
+  let data = {
+    spend_circuits: Array.from(
+      signedTx.spendCircuits.map((item) => Array.from(item))
+    ),
+    output_circuits: Array.from(
+      signedTx.outputCircuits.map((item) => Array.from(item))
+    ),
+    mint_asset_circuits: Array.from(
+      signedTx.mintCircuits.map((item) => Array.from(item))
+    ),
+  };
+  console.log("===> start generate proofs", data);
+  const result = await fetch("http://localhost:10001/generate_proofs", {
+    method: "POST", // 指定请求方法为POST
+    headers: {
+      "Content-Type": "application/json", // 设置内容类型为JSON
+    },
+    body: JSON.stringify(data), // 将JavaScript对象转换为JSON字符串
+  });
+  console.log("===> request duration: ", performance.now() - start);
+  const {
+    spend_proofs: spendProofs,
+    output_proofs: outputProofs,
+    mint_asset_proofs: mintAssetProofs,
+  } = await result.json();
+  console.log("===> proofs: ", spendProofs, outputProofs, mintAssetProofs);
+
+  const res = tx.post_wasm(
+    spendProofs,
+    outputProofs,
+    signedTx.hellmanKeys,
+    mintAssetProofs
+  );
+  console.log("===> res: ", res);
 }
 
 main();

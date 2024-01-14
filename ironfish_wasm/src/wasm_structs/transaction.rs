@@ -15,6 +15,7 @@ use ironfish_rust::transaction::TRANSACTION_FEE_SIZE;
 use ironfish_rust::transaction::TRANSACTION_PUBLIC_KEY_SIZE;
 use ironfish_rust::transaction::TRANSACTION_SIGNATURE_SIZE;
 use wasm_bindgen::prelude::*;
+use js_sys::Uint8Array;
 
 use ironfish_rust::{ProposedTransaction, PublicAddress, SaplingKey, Transaction};
 
@@ -60,6 +61,37 @@ pub struct TransactionCircuits {
     output_circuits: Vec<Vec<u8>>,
     output_diffie_hellman_keys: Vec<Vec<u8>>,
     mint_asset_circuits: Vec<Vec<u8>>,
+}
+
+#[wasm_bindgen]
+impl TransactionCircuits {
+    #[wasm_bindgen(getter, js_name = "spendCircuits")]
+    pub fn spend_circuits(&self) -> Vec<Uint8Array> {
+        self.spend_circuits.iter()
+        .map(|vec| Uint8Array::from(&vec[..]))
+        .collect()
+    }
+
+    #[wasm_bindgen(getter, js_name = "outputCircuits")]
+    pub fn output_circuits(&self) -> Vec<Uint8Array> {
+        self.output_circuits.iter()
+        .map(|vec| Uint8Array::from(&vec[..]))
+        .collect()
+    }
+
+    #[wasm_bindgen(getter, js_name = "mintCircuits")]
+    pub fn mint_circuits(&self) -> Vec<Uint8Array> {
+        self.mint_asset_circuits.iter()
+        .map(|vec| Uint8Array::from(&vec[..]))
+        .collect()
+    }
+
+    #[wasm_bindgen(getter, js_name = "hellmanKeys")]
+    pub fn output_diffie_hellman_keys(&self) -> Vec<Uint8Array> {
+        self.output_diffie_hellman_keys.iter()
+        .map(|vec| Uint8Array::from(&vec[..]))
+        .collect()
+    }
 }
 
 #[wasm_bindgen]
