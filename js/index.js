@@ -4,6 +4,7 @@ import init, {
   WasmNoteEncrypted,
   WasmTransaction,
   WasmNote,
+  WasmProof,
 } from "ironfish_wasm";
 import { Buffer } from "buffer";
 import * as bufio from "bufio";
@@ -268,12 +269,11 @@ async function main() {
   } = await result.json();
   console.log("===> proofs: ", spendProofs, outputProofs, mintAssetProofs);
 
-  const res = tx.post_wasm(
-    spendProofs,
-    outputProofs,
-    signedTx.hellmanKeys,
-    mintAssetProofs
-  );
+  const proofs1 = WasmProof.from_array(new Uint8Array(spendProofs));
+  const proofs2 = WasmProof.from_array(new Uint8Array(outputProofs));
+  const proofs3 = WasmProof.from_array(new Uint8Array(mintAssetProofs));
+
+  const res = tx.post_wasm(proofs1, proofs2, signedTx.hellmanKeys, proofs3);
   console.log("===> res: ", res);
 }
 
