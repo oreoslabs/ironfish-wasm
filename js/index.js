@@ -5,6 +5,7 @@ import init, {
   WasmTransaction,
   WasmNote,
   WasmProof,
+  WasmEphemeralKeyPair,
 } from "ironfish_wasm";
 import { Buffer } from "buffer";
 import * as bufio from "bufio";
@@ -269,12 +270,16 @@ async function main() {
   } = await result.json();
   console.log("===> proofs: ", spendProofs, outputProofs, mintAssetProofs);
 
-  const proofs1 = WasmProof.from_array(new Uint8Array(spendProofs));
-  const proofs2 = WasmProof.from_array(new Uint8Array(outputProofs));
-  const proofs3 = WasmProof.from_array(new Uint8Array(mintAssetProofs));
+  const proofs1 = spendProofs.map((item) => WasmProof.from_array(item));
+  const proofs2 = outputProofs.map((item) => WasmProof.from_array(item));
+  const proofs3 = mintAssetProofs.map((item) => WasmProof.from_array(item));
+  const keys = signedTx.hellmanKeys.map((item) =>
+    WasmEphemeralKeyPair.from_array(item)
+  );
+  console.log("===> new proofs: ", proofs1, proofs2, proofs3, keys);
 
-  const res = tx.post_wasm(proofs1, proofs2, signedTx.hellmanKeys, proofs3);
-  console.log("===> res: ", res);
+  const res = tx.post_wasm(proofs1, proofs2, keys, proofs3);
+  console.log("===> res: ", res, res.to_hex());
 }
 
 main();

@@ -177,6 +177,13 @@ impl WasmTransactionPosted {
     pub fn expiration_sequence(&self) -> u32 {
         self.transaction.expiration()
     }
+
+    pub fn to_hex(&self) -> Result<String, JsValue> {
+        let mut vec: Vec<u8> = vec![];
+        self.transaction.write(&mut vec).map_err(|e| e.to_string())?;
+        let signed_transaction = hex::encode(vec);
+        Ok(signed_transaction)
+    }
 }
 
 #[wasm_bindgen]
