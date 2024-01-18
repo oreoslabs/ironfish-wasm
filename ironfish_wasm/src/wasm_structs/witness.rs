@@ -9,6 +9,8 @@ use wasm_bindgen::JsCast;
 use ironfish_rust::sapling_bls12::Scalar;
 use ironfish_rust::witness::{WitnessNode, WitnessTrait};
 
+use serde::{Deserialize, Serialize};
+
 use super::panic_hook;
 
 #[wasm_bindgen(typescript_custom_section)]
@@ -65,23 +67,33 @@ extern "C" {
     pub fn hash_of_sibling(this: &JsWitnessNode) -> Vec<u8>;
 }
 
+/// wrapper object
+pub struct JsWitness1 {
+    pub obj: JsWitness,
+}
+
 /// Implements WitnessTrait on JsWitness so that witnesses from the
 /// TypeScript side can be passed into classes that require witnesses,
 /// like transactions.
-impl WitnessTrait for JsWitness {
+impl WitnessTrait for JsWitness1 {
     fn verify(&self, hash: &MerkleNoteHash) -> bool {
         panic_hook::set_once();
 
         let mut cursor: std::io::Cursor<Vec<u8>> = std::io::Cursor::new(vec![]);
         hash.write(&mut cursor).unwrap();
 
-        self.verify(&cursor.into_inner())
+        // let obj: JsWitness  = serde_wasm_bindgen::from_value(self.obj).unwrap();
+
+        self.obj.verify(&cursor.into_inner())
     }
 
     fn get_auth_path(&self) -> Vec<WitnessNode<Scalar>> {
         panic_hook::set_once();
 
-        self.auth_path()
+        // let obj: JsWitness  = serde_wasm_bindgen::from_value(self.obj).unwrap();
+
+        self.obj
+            .auth_path()
             .iter()
             .map(|element| {
                 // Unchecked cast here so that wasm-bindgen allows duck-typed objects
@@ -107,12 +119,63 @@ impl WitnessTrait for JsWitness {
         panic_hook::set_once();
 
         // Convert the serialized root hash back to a Scalar
-        let bytes = self.serialize_root_hash();
+        // let obj: JsWitness  = serde_wasm_bindgen::from_value(self.obj).unwrap();
+        let bytes = self.obj.serialize_root_hash();
         let mut cursor: std::io::Cursor<&[u8]> = std::io::Cursor::new(&bytes);
         MerkleNoteHash::read(&mut cursor).unwrap().0
     }
 
     fn tree_size(&self) -> u32 {
-        self.tree_size()
+        // let obj: JsWitness  = serde_wasm_bindgen::from_value(self.obj).unwrap();
+        self.obj.tree_size()
     }
 }
+
+// impl WitnessTrait for JsWitness {
+//     fn verify(&self, hash: &MerkleNoteHash) -> bool {
+//         panic_hook::set_once();
+
+//         let mut cursor: std::io::Cursor<Vec<u8>> = std::io::Cursor::new(vec![]);
+//         hash.write(&mut cursor).unwrap();
+
+//         self.verify(&cursor.into_inner())
+//     }
+
+//     fn get_auth_path(&self) -> Vec<WitnessNode<Scalar>> {
+//         panic_hook::set_once();
+
+//         self.auth_path()
+//             .iter()
+//             .map(|element| {
+//                 // Unchecked cast here so that wasm-bindgen allows duck-typed objects
+//                 // rather than asserting that the object is an instance of JsWitnessNode
+//                 let cast = element.unchecked_into::<JsWitnessNode>();
+
+//                 // hashOfSibling returns a serialized hash, so convert it
+//                 // back into a MerkleNoteHash
+//                 let bytes = cast.hash_of_sibling();
+//                 let mut cursor = std::io::Cursor::new(&bytes);
+//                 let fr = MerkleNoteHash::read(&mut cursor).unwrap().0;
+
+//                 if cast.side() == "Left" {
+//                     WitnessNode::Left(fr)
+//                 } else {
+//                     WitnessNode::Right(fr)
+//                 }
+//             })
+//             .collect()
+//     }
+
+//     fn root_hash(&self) -> Scalar {
+//         panic_hook::set_once();
+
+//         // Convert the serialized root hash back to a Scalar
+//         let bytes = self.serialize_root_hash();
+//         let mut cursor: std::io::Cursor<&[u8]> = std::io::Cursor::new(&bytes);
+//         MerkleNoteHash::read(&mut cursor).unwrap().0
+//     }
+
+//     fn tree_size(&self) -> u32 {
+//         self.tree_size()
+//     }
+// }

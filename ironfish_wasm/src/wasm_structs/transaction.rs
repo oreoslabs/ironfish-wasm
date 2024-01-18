@@ -4,7 +4,10 @@
 
 use super::get_encrypted_note_length;
 use super::WasmAsset;
+use super::WasmEphemeralKeyPair;
+use super::WasmProof;
 use ironfish_rust::assets::asset_identifier::AssetIdentifier;
+use ironfish_rust::keys::EphemeralKeyPair;
 use ironfish_rust::transaction::outputs::PROOF_SIZE;
 use ironfish_rust::transaction::TransactionVersion;
 use ironfish_rust::transaction::TRANSACTION_EXPIRATION_SIZE;
@@ -12,13 +15,14 @@ use ironfish_rust::transaction::TRANSACTION_FEE_SIZE;
 use ironfish_rust::transaction::TRANSACTION_PUBLIC_KEY_SIZE;
 use ironfish_rust::transaction::TRANSACTION_SIGNATURE_SIZE;
 use wasm_bindgen::prelude::*;
+use js_sys::Uint8Array;
 
 use ironfish_rust::{ProposedTransaction, PublicAddress, SaplingKey, Transaction};
 
 use super::errors::*;
 use super::note::WasmNote;
 use super::panic_hook;
-use super::witness::JsWitness;
+use super::witness::{JsWitness, JsWitness1};
 use super::WasmSpendDescription;
 
 #[wasm_bindgen]
@@ -49,6 +53,45 @@ pub fn get_transaction_fee_length() -> u32 {
 #[wasm_bindgen]
 pub fn get_latest_transaction_version() -> u8 {
     TransactionVersion::latest() as u8
+}
+
+#[wasm_bindgen]
+pub struct TransactionCircuits {
+    spend_circuits: Vec<Vec<u8>>,
+    output_circuits: Vec<Vec<u8>>,
+    output_diffie_hellman_keys: Vec<Vec<u8>>,
+    mint_asset_circuits: Vec<Vec<u8>>,
+}
+
+#[wasm_bindgen]
+impl TransactionCircuits {
+    #[wasm_bindgen(getter, js_name = "spendCircuits")]
+    pub fn spend_circuits(&self) -> Vec<Uint8Array> {
+        self.spend_circuits.iter()
+        .map(|vec| Uint8Array::from(&vec[..]))
+        .collect()
+    }
+
+    #[wasm_bindgen(getter, js_name = "outputCircuits")]
+    pub fn output_circuits(&self) -> Vec<Uint8Array> {
+        self.output_circuits.iter()
+        .map(|vec| Uint8Array::from(&vec[..]))
+        .collect()
+    }
+
+    #[wasm_bindgen(getter, js_name = "mintCircuits")]
+    pub fn mint_circuits(&self) -> Vec<Uint8Array> {
+        self.mint_asset_circuits.iter()
+        .map(|vec| Uint8Array::from(&vec[..]))
+        .collect()
+    }
+
+    #[wasm_bindgen(getter, js_name = "hellmanKeys")]
+    pub fn output_diffie_hellman_keys(&self) -> Vec<Uint8Array> {
+        self.output_diffie_hellman_keys.iter()
+        .map(|vec| Uint8Array::from(&vec[..]))
+        .collect()
+    }
 }
 
 #[wasm_bindgen]
@@ -134,6 +177,13 @@ impl WasmTransactionPosted {
     pub fn expiration_sequence(&self) -> u32 {
         self.transaction.expiration()
     }
+
+    pub fn to_hex(&self) -> Result<String, JsValue> {
+        let mut vec: Vec<u8> = vec![];
+        self.transaction.write(&mut vec).map_err(|e| e.to_string())?;
+        let signed_transaction = hex::encode(vec);
+        Ok(signed_transaction)
+    }
 }
 
 #[wasm_bindgen]
@@ -165,9 +215,11 @@ impl WasmTransaction {
 
     /// Spend the note owned by spender_hex_key at the given witness location.
     #[wasm_bindgen]
-    pub fn spend(&mut self, note: &WasmNote, witness: &JsWitness) -> Result<String, JsValue> {
+    pub fn spend(&mut self, note: &WasmNote, witness: JsWitness) -> Result<String, JsValue> {
+        let witness = JsWitness1 { obj: witness };
+        // println!("spend: {:?}", witness);
         self.transaction
-            .add_spend(note.note.clone(), witness)
+            .add_spend(note.note.clone(), &witness)
             .map_err(WasmIronfishError)?;
         Ok("".to_string())
     }
@@ -250,6 +302,91 @@ impl WasmTransaction {
 
         Ok(WasmTransactionPosted {
             transaction: posted_transaction,
+        })
+    }
+
+    #[wasm_bindgen]
+    pub fn post_wasm(
+        &mut self,
+        spend_proofs: Vec<WasmProof>,
+        output_proofs: Vec<WasmProof>,
+        output_diffie_hellman_keys: Vec<WasmEphemeralKeyPair>,
+        mint_asset_proofs: Vec<WasmProof>,
+    ) -> Result<WasmTransactionPosted, JsValue> {
+        let spend_proofs = spend_proofs
+            .iter()
+            .map(|proof| proof.proof.clone())
+            .collect();
+        let output_proofs = output_proofs
+            .iter()
+            .map(|proof| proof.proof.clone())
+            .collect();
+        let key_pairs = output_diffie_hellman_keys
+            .iter()
+            .map(|key_pair| EphemeralKeyPair::from_bytes_le(key_pair.key_pair_bytes.clone()))
+            .collect();
+        let mint_asset_proofs = mint_asset_proofs
+            .iter()
+            .map(|proof| proof.proof.clone())
+            .collect();
+        let posted_transaction = self
+            .transaction
+            .post_wasm(spend_proofs, output_proofs, key_pairs, mint_asset_proofs)
+            .map_err(WasmIronfishError)?;
+
+        Ok(WasmTransactionPosted {
+            transaction: posted_transaction,
+        })
+    }
+
+    #[wasm_bindgen]
+    pub fn build_circuits(
+        &mut self,
+        change_goes_to: Option<String>,
+        intended_transaction_fee: u64,
+    ) -> Result<TransactionCircuits, JsValue> {
+        let change_key = match change_goes_to {
+            Some(s) => Some(PublicAddress::from_hex(&s).map_err(WasmIronfishError)?),
+            None => None,
+        };
+
+        let (spend_circuits, output_circuits, output_diffie_hellman_keys, mint_circuits) = self
+            .transaction
+            .build_circuits(change_key, intended_transaction_fee)
+            .map_err(WasmIronfishError)?;
+        let spend_circuits: Vec<Vec<u8>> = spend_circuits
+            .iter()
+            .map(|spend| {
+                let mut spend_bytes = vec![];
+                spend.write(&mut spend_bytes).unwrap();
+                spend_bytes
+            })
+            .collect();
+        let output_circuits: Vec<Vec<u8>> = output_circuits
+            .iter()
+            .map(|output| {
+                let mut output_bytes = vec![];
+                output.write(&mut output_bytes).unwrap();
+                output_bytes
+            })
+            .collect();
+        let output_diffie_hellman_keys: Vec<Vec<u8>> = output_diffie_hellman_keys
+            .iter()
+            .map(|keys| keys.to_bytes_le())
+            .collect();
+        let mint_asset_circuits: Vec<Vec<u8>> = mint_circuits
+            .iter()
+            .map(|mint_asset| {
+                let mut mint_asset_bytes = vec![];
+                mint_asset.write(&mut mint_asset_bytes).unwrap();
+                mint_asset_bytes
+            })
+            .collect();
+        Ok(TransactionCircuits {
+            spend_circuits,
+            output_circuits,
+            output_diffie_hellman_keys,
+            mint_asset_circuits,
         })
     }
 
