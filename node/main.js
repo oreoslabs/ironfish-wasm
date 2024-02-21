@@ -218,11 +218,11 @@ async function main() {
     const parsedNote = Note.deserialize(Buffer.from(note, "hex"));
     tx.output(parsedNote);
   }
-  const signedTx = tx.post(
+  const withProofTx = tx.post(
     "7dbb62fa99ac81640b6ee5f84a3b0e2390a1f40ccfa6eb6151ff5e0a98503923",
     1n
   );
-  const result = Buffer.from(signedTx).toString("hex");
+  const result = Buffer.from(withProofTx).toString("hex");
 
   console.log("result: ", result);
 }

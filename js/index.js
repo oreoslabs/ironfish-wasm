@@ -226,32 +226,28 @@ async function main() {
     const parsedNote = WasmNote.deserialize(Buffer.from(note, "hex"));
     tx.output(parsedNote);
   }
-  // const signedTx = tx.post(
-  //   "7dbb62fa99ac81640b6ee5f84a3b0e2390a1f40ccfa6eb6151ff5e0a98503923",
-  //   1n
-  // );
-  const signedTx = tx.build_circuits(
+  const withProofTx = tx.build_circuits(
     "7dbb62fa99ac81640b6ee5f84a3b0e2390a1f40ccfa6eb6151ff5e0a98503923",
     1n
   );
   console.log(
-    "signedTx: ",
-    signedTx.mintCircuits,
-    signedTx.outputCircuits,
-    signedTx.spendCircuits,
-    signedTx.hellmanKeys
+    "withProofTx: ",
+    withProofTx.mintCircuits,
+    withProofTx.outputCircuits,
+    withProofTx.spendCircuits,
+    withProofTx.hellmanKeys
   );
 
   start = performance.now();
   let data = {
     spend_circuits: Array.from(
-      signedTx.spendCircuits.map((item) => Array.from(item))
+      withProofTx.spendCircuits.map((item) => Array.from(item))
     ),
     output_circuits: Array.from(
-      signedTx.outputCircuits.map((item) => Array.from(item))
+      withProofTx.outputCircuits.map((item) => Array.from(item))
     ),
     mint_asset_circuits: Array.from(
-      signedTx.mintCircuits.map((item) => Array.from(item))
+      withProofTx.mintCircuits.map((item) => Array.from(item))
     ),
   };
   console.log("===> start generate proofs", data);
@@ -273,7 +269,7 @@ async function main() {
   const proofs1 = spendProofs.map((item) => WasmProof.from_array(item));
   const proofs2 = outputProofs.map((item) => WasmProof.from_array(item));
   const proofs3 = mintAssetProofs.map((item) => WasmProof.from_array(item));
-  const keys = signedTx.hellmanKeys.map((item) =>
+  const keys = withProofTx.hellmanKeys.map((item) =>
     WasmEphemeralKeyPair.from_array(item)
   );
   console.log("===> new proofs: ", proofs1, proofs2, proofs3, keys);
