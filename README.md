@@ -1,10 +1,11 @@
-## Accounts
+# Overview
 
-This is a Rust wrapper for creating accounts and transactions to be converted into WASM.
+This is a Rust wrapper for creating Ironfish accounts and transactions to be converted into WASM. For developers, navigate to [index.html](./index.html) for how it works.
 
-### To Compile WASM
+## To Compile WASM
 
 ```
+npm install
 npm run build
 ```
 
