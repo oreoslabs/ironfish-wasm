@@ -1,4 +1,3 @@
-use ironfish_rust::keys::EphemeralKeyPair;
 use wasm_bindgen::prelude::*;
 use js_sys::Uint8Array;
 

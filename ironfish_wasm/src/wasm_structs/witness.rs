@@ -9,8 +9,6 @@ use wasm_bindgen::JsCast;
 use ironfish_rust::sapling_bls12::Scalar;
 use ironfish_rust::witness::{WitnessNode, WitnessTrait};
 
-use serde::{Deserialize, Serialize};
-
 use super::panic_hook;
 
 #[wasm_bindgen(typescript_custom_section)]

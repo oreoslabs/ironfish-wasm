@@ -256,11 +256,11 @@ async function main() {
   };
   console.log("===> start generate proofs", data);
   const result = await fetch("http://localhost:10001/generate_proofs", {
-    method: "POST", // 指定请求方法为POST
+    method: "POST",
     headers: {
-      "Content-Type": "application/json", // 设置内容类型为JSON
+      "Content-Type": "application/json",
     },
-    body: JSON.stringify(data), // 将JavaScript对象转换为JSON字符串
+    body: JSON.stringify(data),
   });
   console.log("===> request duration: ", performance.now() - start);
   const {

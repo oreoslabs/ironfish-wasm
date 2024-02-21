@@ -1,6 +1,5 @@
 use ironfish_rust::transaction::{Bls12, Proof};
 use wasm_bindgen::prelude::*;
-use js_sys::Uint8Array;
 use std::io::Cursor;
 
 #[wasm_bindgen]
